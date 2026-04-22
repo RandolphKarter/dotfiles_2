@@ -1,5 +1,6 @@
 # конфиги/скрипты
 
+```
 .config/bspwm/bspwmrc
 .config/bspwm/monitors.sh - логика мониторов + их переключение через kvm
 
@@ -13,3 +14,4 @@
 
 Положить сюда
 /usr/local/bin/brave - алиас для brave с local proxy
+```
