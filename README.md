@@ -3,8 +3,8 @@
 https://github.com/RandolphKarter/dotfiles_2.git
 
 
-1. нужен ли .config/rofi/config.rasi   ??? вероятно да
-2. 
+1. + нужен ли .config/rofi/config.rasi   ??? вероятно да
+2. нужно установить шрифты
 
 ==============================
 
@@ -34,7 +34,7 @@ apt install sudo
 usermod -aG sudo username
 
 Установить первые пакеты
-apt install xorg kitty bspwm sxhkd picom rofi polybar lightdm git curl tree nnn
+apt install xorg kitty bspwm sxhkd picom rofi polybar lightdm git curl tree nnn vim
 
 Возможно понадобятся xinit x11-xserver-utils, но в Debian 13 они идут в xorg
 
@@ -52,6 +52,12 @@ apt install xorg
 Перенести файлы
 
 
+Сделать испольняемыми:
+chmod +x ~/.config/bspwm/bspwmrc
+chmod +x ~/.config/bspwm/monitors.sh
+chmod +x ~/.config/sxhkd/sxhkdrc
+chmod +x ~/.config/rofi/powermenu.sh
+
 
 ------------------------
 xorg (должен включать xinit и x11-xserver-utils)
@@ -66,4 +72,4 @@ curl
 lightdm
 tree 
 nnn
-
+vim
