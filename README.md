@@ -4,7 +4,9 @@ https://github.com/RandolphKarter/dotfiles_2.git
 
 
 1. + нужен ли .config/rofi/config.rasi   ??? вероятно да
-2. нужно установить шрифты
+2. + нужно установить шрифты
+3. Разобраться со скриптом подключения/перекчения мониторов
+4. 
 
 ==============================
 
@@ -50,6 +52,7 @@ apt install xorg
 Скачать гитом конфиги
 Создать директорию ~/.config
 Перенести файлы
+!!!! тут надо все что в .config - положить в эту папку, и сразу ее копировать
 
 
 Сделать испольняемыми:
@@ -58,6 +61,11 @@ chmod +x ~/.config/bspwm/monitors.sh
 chmod +x ~/.config/sxhkd/sxhkdrc
 chmod +x ~/.config/rofi/powermenu.sh
 
+Установи шрифты для polebar
+sudo apt install fonts-font-awesome
+
+Проверь что они в системе
+fc-list | grep -i awesome
 
 ------------------------
 xorg (должен включать xinit и x11-xserver-utils)
