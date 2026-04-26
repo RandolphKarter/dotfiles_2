@@ -1,12 +1,22 @@
-Сделай репозиторий публичным
-
-https://github.com/RandolphKarter/dotfiles_2.git
-
-
 1. + нужен ли .config/rofi/config.rasi   ??? вероятно да
 2. + нужно установить шрифты
 3. Разобраться со скриптом подключения/перекчения мониторов
-4. 
+launch.sh
+monitors.sh
+Чтобы все в одном месте проверялось
+4. из bspwmrc:
+- удалить nitrogen
+- разобраться где хранить обои и поменять путь
++/- и вообще удалить лишнее из всех конфигов
++ 5. Разобраться как в lightdm по дефолту установить своего юзера
++ и что там за сессия вторая?
+6. Что за ошибки в systemctl --user status wireplumber ???
+7. Проверить автопереключние микрофон в приложениях со звонками
++ 8. поменяй раскладку и язык системы
+9. поискать темы в apt search gtk-theme
+10. Добавить в powermenu опцию для лока экрана?
+11. Разбить readme на команды в зависимости от этапа установки
+- в части установки пакетов, пока нет браузера
 
 ==============================
 
@@ -21,8 +31,12 @@ https://github.com/RandolphKarter/dotfiles_2.git
 .config/polybar/config.ini
 .config/polybar/launch.sh - запуск polybar
 
-Переложить в конфиг?
-~/dev/rofi_ext/powermenu.sh - кнопка poweroff/restart в polybar
+.config/rofi/config.rasi
+.config/rofi/powermenu.sh
+
+.config/kitty/kitty.conf
+
+.config/picom/picom.sample.conf
 
 Положить сюда
 /usr/local/bin/brave - алиас для brave с local proxy
@@ -36,18 +50,21 @@ apt install sudo
 usermod -aG sudo username
 
 Установить первые пакеты
-apt install xorg kitty bspwm sxhkd picom rofi polybar lightdm git curl tree nnn vim
+apt install xorg xinit x11-xserver-utils kitty bspwm sxhkd picom rofi polybar lightdm git curl tree nnn vim network-manager network-manager-gnome firefox-esr mesa-utils mesa-vulkan-drivers pipewire wireplumber pavucontrol bluez blueman libspa-0.2-bluetooth zip unzip thunar dunst flameshot lm-sensors brightnessctl lxappearance transmission vlc htop gimp peek libreoffice xss-lock i3lock 
+
+Если NVIDIA ставь еще 
+nvtop
 
 Возможно понадобятся xinit x11-xserver-utils, но в Debian 13 они идут в xorg
+mesa-vulkan-drivers должен приехать вместе с xorg (как и основной пакет mesa)
+bluez должен быть уже установлен
 
-Установить 
-
-
-apt install xorg
 
 ------------------------
 После уставноки lightdm проверить что создался файл отвечающий за запуск bspwm: 
 /usr/share/xsessions/bspwm.desktop
+Если создался еще /usr/share/xsessions/lightdm.desktop - добавь в него, чтобы такая сессия не предлагалась
+Hidden=true
 
 Скачать гитом конфиги
 Создать директорию ~/.config
@@ -67,6 +84,139 @@ sudo apt install fonts-font-awesome
 Проверь что они в системе
 fc-list | grep -i awesome
 
+
+Интернет
+nmcli dev status
+Если только lo, нужно:
+sudo vim /etc/network/interfaces
+закоменить или удалить 
+allow-hotplug wlo1
+iface wlo1 inet dhcp
+
+sudo vim /etc/NetworkManager/NetworkManager.conf 
+установить true вместо false
+[ifupdown] managed=true
+
+Перезапуск или вообще ребутнуть
+sudo systemctl restart NetworkManager
+
+После можно подключаться к сети
+
+Проверка драйвера видео
+Для msi после установки mesa
+
+glxinfo | grep "OpenGL renderer"
+Должно быть "Mesa Intel..."
+
+lsmod | grep i915
+Тут останется i915, это ок
+
+Звук
+pipewire wireplumber запустятся после перезагрузки?
+или нужно станчала активировать через ??
+systemctl --user enable --now pipewire
+systemctl --user enable --now wireplumber
+
+Polybar
+https://github.com/polybar/polybar/wiki/
+Температура:
+После установки lm-sensors
+Настройка
+sudo sensors-detect
+Вывод
+sensors
+Дальше по гайду Module:-temperature
+Найди нужный сенсор ?? "Package id 0" ?? (что будет на втором компе?)
+
+Батарейка
+По гайду, заменить пару значений
+
+backlight
+поменять карту
+msi - intel_backlight
+lenovo - nvidia
+
+??? Ниже ХЗ нужно ли для lenovo
+создать файл 
+/etc/udev/rules.d/backlight.rules
+
+вписать туда
+ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", RUN+="/usr/bin/chgrp video /sys/class/backlight/acpi_video0/brightness"
+ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", RUN+="/usr/bin/chmod g+w /sys/class/backlight/acpi_video0/brightness"
+
+ПОПРОБУЙ
+ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", GROUP="video", MODE="0664"
+
+перезагрузиться
+
+Управление клавишами FN+ на msi
+В sxhkd
+яркость 
+XF86MonBrightnessUp
+    brightnessctl s 5+
+XF86MonBrightnessDown
+    brightnessctl s 5-
+
+Громкость (с pipewire)
+XF86AudioRaiseVolume
+    wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+
+XF86AudioLowerVolume
+    wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+
+XF86AudioMute
+    wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+ZSH
+тут все по гайду 
+apt install zsh
+не забыть сменить bash и перелогиниться
+Oh My Zsh
+(скопируй из гайда с хабра)
+
+Раскладка EN+RU
+sudo vim /etc/default/keyboard
+
+XKBMODEL="pc105"
+XKBLAYOUT="us,ru"
+XKBVARIANT=""
+XKBOPTIONS="grp:alt_shift_toggle"
+
+BACKSPACE="guess"
+
+
+lightdm
+Выбор юзера, чтобы не вводить логин постоянно
+sudo vim /etc/lightdm/lightdm.conf
+раскоментировать
+```
+[Seat:*]
+greeter-hide-users=false
+```
+
+Тема
+Узнать greeter
+dpkg -l | grep lightdm
+Скорее всего будет lightdm-gtk-greeter
+В этом файле
+sudo nano /etc/lightdm/lightdm-gtk-greeter.conf
+Раскоментировать и вписать тему 
+```
+[greeter]
+theme-name=Adwaita-dark
+```
+
+Скринсейвер
+Проверить путь к изображению в bspwmrc
+Важно - нужно именно png
+xss-lock -- i3lock -i ~/Pictures/wallpaper.png
+
+Установка остальных deb пакетов
+sudo dpkg -i package.deb
+
+Алиас для lite-xl
+sudo ln -s ~/.local/bin/lite-xl /usr/local/bin/lite-xl
+
 ------------------------
 xorg (должен включать xinit и x11-xserver-utils)
 kitty 
@@ -81,3 +231,52 @@ lightdm
 tree 
 nnn
 vim
+network-manager
+network-manager-gnome
+firefox-esr - хоть какой-то первый браузер
+pipewire
+wireplumber
+pavucontrol
+bluez 
+blueman
+libspa-0.2-bluetooth - иначе блютуз не сможет подключиться
+zip
+unzip
+thunar
+dunst - уведомления
+flameshot
+lm-sensors
+brightnessctl - для управления яркостью и громкостью через клавиши
+lxappearance - темы
+transmission
+vlc
+htop
+nvtop - только для NVIDIA
+gimp
+peek
+libreoffice
+xss-lock 
+i3lock 
+
+Подумать (не включены в список):
+??? Diodon или все же parcellite
+gtk2-engines-murrine gtk2-engines-pixbuf - чтобы GTK2/GTK3 работали норм с lxappearance
+
+
+Осталось:
++ zsh + 1000 что-то там
+
+
+
++ subl или lite xl
++ insomnia (postman)
++ pycharm
++ chrome
++ brave
++ v2rayN
++ telegram
++ charles proxy
++ http toolkit
++ android studio
+
+
