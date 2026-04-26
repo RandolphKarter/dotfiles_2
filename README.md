@@ -50,14 +50,22 @@ apt install sudo
 usermod -aG sudo username
 
 Установить первые пакеты
-apt install xorg xinit x11-xserver-utils kitty bspwm sxhkd picom rofi polybar lightdm git curl tree nnn vim network-manager network-manager-gnome firefox-esr mesa-utils mesa-vulkan-drivers pipewire wireplumber pavucontrol bluez blueman libspa-0.2-bluetooth zip unzip thunar dunst flameshot lm-sensors brightnessctl lxappearance transmission vlc htop gimp peek libreoffice xss-lock i3lock 
+apt install xorg xinit x11-xserver-utils kitty bspwm sxhkd picom rofi polybar git curl tree nnn vim network-manager network-manager-gnome firefox-esr
 
-Если NVIDIA ставь еще 
+
+Остальные пакеты
+lightdm pipewire wireplumber pavucontrol bluez blueman libspa-0.2-bluetooth zip unzip thunar dunst flameshot lm-sensors brightnessctl lxappearance transmission vlc htop gimp peek libreoffice xss-lock i3lock 
+
+Для msi
+mesa-utils mesa-vulkan-drivers
+
+Для Lenovo
+дрова nvidia 
 nvtop
 
 Возможно понадобятся xinit x11-xserver-utils, но в Debian 13 они идут в xorg
 mesa-vulkan-drivers должен приехать вместе с xorg (как и основной пакет mesa)
-bluez должен быть уже установлен
+bluez тоже должен быть уже установлен
 
 
 ------------------------
@@ -67,18 +75,19 @@ bluez должен быть уже установлен
 Hidden=true
 
 Скачать гитом конфиги
-Создать директорию ~/.config
-Перенести файлы
-!!!! тут надо все что в .config - положить в эту папку, и сразу ее копировать
+Создать директорию 
+mkdir ~/.config
+Скопировать в нее файлы
 
 
-Сделать испольняемыми:
+Сделать исполняемыми:
 chmod +x ~/.config/bspwm/bspwmrc
-chmod +x ~/.config/bspwm/monitors.sh
 chmod +x ~/.config/sxhkd/sxhkdrc
+chmod +x ~/.config/bspwm/monitors.sh
 chmod +x ~/.config/rofi/powermenu.sh
+chmod +x ~/.config/polybar/launch.sh
 
-Установи шрифты для polebar
+Установи шрифты для polybar
 sudo apt install fonts-font-awesome
 
 Проверь что они в системе
@@ -89,7 +98,7 @@ fc-list | grep -i awesome
 nmcli dev status
 Если только lo, нужно:
 sudo vim /etc/network/interfaces
-закоменить или удалить 
+закоментить или удалить 
 allow-hotplug wlo1
 iface wlo1 inet dhcp
 
@@ -97,7 +106,7 @@ sudo vim /etc/NetworkManager/NetworkManager.conf
 установить true вместо false
 [ifupdown] managed=true
 
-Перезапуск или вообще ребутнуть
+Перезапуск или вообще ребутнуть тачку
 sudo systemctl restart NetworkManager
 
 После можно подключаться к сети
@@ -113,12 +122,12 @@ lsmod | grep i915
 
 Звук
 pipewire wireplumber запустятся после перезагрузки?
-или нужно станчала активировать через ??
+или нужно сначала активировать через ??
 systemctl --user enable --now pipewire
 systemctl --user enable --now wireplumber
 
 Polybar
-https://github.com/polybar/polybar/wiki/
+По гайду из их вики
 Температура:
 После установки lm-sensors
 Настройка
@@ -126,7 +135,10 @@ sudo sensors-detect
 Вывод
 sensors
 Дальше по гайду Module:-temperature
-Найди нужный сенсор ?? "Package id 0" ?? (что будет на втором компе?)
+MSI
+Найди нужный сенсор ?? "Package id 0" ?? 
+LENOVO
+(что будет на втором компе?)
 
 Батарейка
 По гайду, заменить пару значений
@@ -136,16 +148,13 @@ backlight
 msi - intel_backlight
 lenovo - nvidia
 
-??? Ниже ХЗ нужно ли для lenovo
+??? Ниже для MSI, хз нужно ли для lenovo
 создать файл 
 /etc/udev/rules.d/backlight.rules
 
 вписать туда
 ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", RUN+="/usr/bin/chgrp video /sys/class/backlight/acpi_video0/brightness"
 ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", RUN+="/usr/bin/chmod g+w /sys/class/backlight/acpi_video0/brightness"
-
-ПОПРОБУЙ
-ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", GROUP="video", MODE="0664"
 
 перезагрузиться
 
@@ -176,14 +185,14 @@ Oh My Zsh
 
 Раскладка EN+RU
 sudo vim /etc/default/keyboard
-
+```
 XKBMODEL="pc105"
 XKBLAYOUT="us,ru"
 XKBVARIANT=""
 XKBOPTIONS="grp:alt_shift_toggle"
 
 BACKSPACE="guess"
-
+```
 
 lightdm
 Выбор юзера, чтобы не вводить логин постоянно
@@ -211,10 +220,15 @@ theme-name=Adwaita-dark
 Важно - нужно именно png
 xss-lock -- i3lock -i ~/Pictures/wallpaper.png
 
-Установка остальных deb пакетов
+Установка утилит в deb пакетах
 sudo dpkg -i package.deb
 
-Алиас для lite-xl
+Для архивов
+tar -xzf file.tar.gz
+tar -xJf file.tar.xz
+Перетащить если надо в /opt
+
+Создание алиаса на примере lite-xl
 sudo ln -s ~/.local/bin/lite-xl /usr/local/bin/lite-xl
 
 ------------------------
@@ -265,7 +279,6 @@ gtk2-engines-murrine gtk2-engines-pixbuf - чтобы GTK2/GTK3 работали
 
 Осталось:
 + zsh + 1000 что-то там
-
 
 
 + subl или lite xl
