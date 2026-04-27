@@ -1,98 +1,81 @@
-1. + нужен ли .config/rofi/config.rasi   ??? вероятно да
-2. + нужно установить шрифты
-3. Разобраться со скриптом подключения/перекчения мониторов
-launch.sh
-monitors.sh
-Чтобы все в одном месте проверялось
-4. из bspwmrc:
-- удалить nitrogen
-- разобраться где хранить обои и поменять путь
-+/- и вообще удалить лишнее из всех конфигов
-+ 5. Разобраться как в lightdm по дефолту установить своего юзера
-+ и что там за сессия вторая?
-6. Что за ошибки в systemctl --user status wireplumber ???
-7. Проверить автопереключние микрофон в приложениях со звонками
-+ 8. поменяй раскладку и язык системы
-9. поискать темы в apt search gtk-theme
-10. Добавить в powermenu опцию для лока экрана?
-11. Разбить readme на команды в зависимости от этапа установки
-- в части установки пакетов, пока нет браузера
+# Гайд по установке Debian + bspwm 
+Собраны все шаги, чтобы не решать каждый раз одни и те же проблемы :shit: и не вспоминать команды :rage:
+Можете кидаться тапками, мне пох :sunglasses:
 
-==============================
+## Подготовка и установка
+:exclamation:Не забудь сохранить все важный файлы.:exclamation:
 
-# конфиги/скрипты
-
+### Подготовка флешки
+1. Скачать ISO образ Debian
+2. Узнать имя флешки - будет что-то типа `/dev/sda`
 ```
-.config/bspwm/bspwmrc
-.config/bspwm/monitors.sh - логика мониторов + их переключение через kvm
-
-.config/sxhkd/sxhkdrc 
-
-.config/polybar/config.ini
-.config/polybar/launch.sh - запуск polybar
-
-.config/rofi/config.rasi
-.config/rofi/powermenu.sh
-
-.config/kitty/kitty.conf
-
-.config/picom/picom.sample.conf
-
-Положить сюда
-/usr/local/bin/brave - алиас для brave с local proxy
+lsblk
 ```
-Под root
+2. Записать образ на диск
+Поменять в команде 
+- `if` на путь до образа
+- `of` на название флешки
+Пример:
+```
+sudo dd if=/home/<USER>/Downloads/debian_13.iso of=/dev/sda bs=4M status=progress oflag=sync
+``` 
+3. После записи
+```
+sync
+```
+### Установка Debian
+Все просто - ставь чистую систему без DE.  
+Разметка диска (примерно):
+- `EFI` - 500 MB
+    - тип: `EFI System`
+    - ФС: `FAT32` (но вроде он сам выбирает)
+- `swap` — 15 GB (~размер RAM)
+    - тип: `swap area`
+- `/` - 50 GB
+    - ФС: `ext4` (по умолчанию)
+- `/boot` - 500 MB или 1 GB
+    - ФС: `ext4`
+- `/home` - все оставшееся
+    - ФС: `ext4`
 
-Установить sudo
+## Настройка системы
+### Добавление юзера в sudo
+1. Зайти под root и установить sudo
 ```
 apt install sudo
 ```
-
-Добавить юзера в sudo 
+2. Добавить юзера в sudo 
 ```
 usermod -aG sudo username
 ```
 
-
-Установить первые пакеты
+## Установка первых пакетов
+Установить первые пакеты.  
+Все что необходимо для работы в терминале и первичной настройки окружения.
 ```
 sudo apt install xorg xinit x11-xserver-utils kitty bspwm sxhkd picom rofi polybar git curl tree nnn vim network-manager network-manager-gnome firefox-esr
 ```
+Возможно xinit x11-xserver-utils уже установлены, в Debian 13 они идут в вместе с `xorg`
 
-Остальные пакеты
-```
-sudo apt install lightdm pipewire wireplumber pavucontrol bluez blueman libspa-0.2-bluetooth zip unzip thunar dunst flameshot lm-sensors brightnessctl lxappearance transmission vlc htop gimp peek libreoffice xss-lock i3lock 
-```
+## Перенос конфигов/скриптов
+Клонируй репозиторий.
+В репозитории есть уже готовая папка `.config`
+Скопируй ее и перенеси в `/home/<USER>`
+Содержимое:
+- `.config/bspwm/bspwmrc`
+- `.config/bspwm/monitors.sh` - логика мониторов + их переключение через kvm
+- `.config/sxhkd/sxhkdrc` 
+- `.config/polybar/config.ini`
+- `.config/polybar/launch.sh` - запуск polybar
+- `.config/rofi/config.rasi`
+- `.config/rofi/powermenu.sh` - кнопка poweroff/reboot в polybar
+- `.config/kitty/kitty.conf`
+- `.config/picom/picom.sample.conf`
 
-
-Для msi
+Отдельно лежащий файл brave (скрипт для запуска brave с local proxy) перетащи сюда:
 ```
-sudo apt install  mesa-utils mesa-vulkan-drivers
+/usr/local/bin/brave
 ```
-
-Для Lenovo
-ДРОВА NVIDIA 
-```
-sudo apt install nvtop
-```
-
-Возможно понадобятся xinit x11-xserver-utils, но в Debian 13 они идут в xorg
-mesa-vulkan-drivers должен приехать вместе с xorg (как и основной пакет mesa)
-bluez тоже должен быть уже установлен
-
-
-------------------------
-После уставноки lightdm проверить что создался файл отвечающий за запуск bspwm: 
-```
-/usr/share/xsessions/bspwm.desktop
-```
-Если создался еще /usr/share/xsessions/lightdm.desktop - добавь в него, чтобы такая сессия не предлагалась
-```
-Hidden=true
-```
-
-Скачать гитом конфиги
-Скопировать директорию .config
 
 Сделать исполняемыми:
 ```
@@ -102,110 +85,98 @@ chmod +x ~/.config/bspwm/monitors.sh
 chmod +x ~/.config/rofi/powermenu.sh
 chmod +x ~/.config/polybar/launch.sh
 ```
+??? `/usr/local/bin/brave` - тоже делать исполняемым? 
 
-Установи шрифты для polybar
+## Установка шрифтов
+- `fonts-font-awesome` - для polybar
+- `fonts-noto-color-emoji` - эмоджи в браузере и редакторах
+- `fonts-noto fonts-noto-core fonts-noto-ui-core` - доп пакет шрифтов
+
 ```
 sudo apt install fonts-font-awesome fonts-noto-color-emoji fonts-noto fonts-noto-core fonts-noto-ui-core
 ```
-fonts-font-awesome - для для polybar
-fonts-noto-color-emoji - эмоджи в браузере и редакторах
-fonts-noto fonts-noto-core fonts-noto-ui-core - доп пакет шрифтов
 
-
-Проверь что они в системе
+Проверь что они есть в системе ??? добавь остальные в команду
 ```
 fc-list | grep -i awesome
 ```
 
-Интернет
+## Подключение wifi
+До этого все работало из-за заданной при установки Debian настройки в `/etc/network/interfaces`.  
+Проверить доступные интерфейсы
 ```
 nmcli dev status
 ```
-Если только lo, нужно:
+Если только lo, открыть файл:
 ```
 sudo vim /etc/network/interfaces
 ```
-закоментить или удалить 
+Закоментить или удалить (удаляем настройку заданную при установке):
 ```
 allow-hotplug wlo1
 iface wlo1 inet dhcp
 ```
-И еще 
+Также открыть конфиг:
 ```
 sudo vim /etc/NetworkManager/NetworkManager.conf 
 ```
-установить true вместо false
+И установить `true` вместо `false`
 ```
 [ifupdown] managed=true
 ```
-
-Перезапуск или вообще ребутнуть тачку
+Перезапустить `NetworkManager` или просто ребутнуть тачку
 ```
 sudo systemctl restart NetworkManager
 ```
+Теперь можно подключаться к сети через `nm-applet`
 
-После можно подключаться к сети
-
-
-Проверка драйвера видео
-Для msi после установки mesa
-```
-glxinfo | grep "OpenGL renderer"
-```
-Должно быть "Mesa Intel..."
-```
-lsmod | grep i915
-```
-Тут останется i915, это ок
-
-Звук
-pipewire wireplumber запустятся после перезагрузки?
-или нужно сначала активировать через ??
-```
-systemctl --user enable --now pipewire
-systemctl --user enable --now wireplumber
-```
-
-Polybar
-По гайду из их вики
-Температура:
-После установки lm-sensors
-Настройка
+## Настройка модулей Polybar
+Все по [гайду из их вики](https://github.com/polybar/polybar/wiki)
+### Температура
+Настрой lm-sensors (на все соглашайся)
 ```
 sudo sensors-detect
 ```
-Вывод
+Проверь вывод
 ```
 sensors
 ```
-Дальше по гайду Module:-temperature
-MSI
-Найди нужный сенсор ?? "Package id 0" ?? 
-LENOVO
-(что будет на втором компе?)
+Смотри что там по `Package id 0`
+- MSI, найди нужный сенсор ??? `Package id 0`
+- LENOVO - ???
 
-Батарейка
-По гайду, заменить пару значений
+### Батарея
+Просто заменить пару значений в соответствии с гайдом
 
-backlight
-поменять карту
-msi - intel_backlight
-lenovo - nvidia
+### Подсветка
+Поменять карту
+- MSI - intel_backlight
+- LENOVO - nvidia
 
-??? Ниже для MSI, хз нужно ли для lenovo
-создать файл /etc/udev/rules.d/backlight.rules
+#### Изменения яркости колесом мышки
+Ниже детали найтроки для MSI
+??? хз нужно ли для lenovo
 
-вписать туда
+Создать файл 
+```
+touch /etc/udev/rules.d/backlight.rules
+```
+Вписать туда
 ```
 ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", RUN+="/usr/bin/chgrp video /sys/class/backlight/acpi_video0/brightness"
 ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", RUN+="/usr/bin/chmod g+w /sys/class/backlight/acpi_video0/brightness"
 ```
-перезагрузиться
+Перезагрузиться
 
+#### Изменения яркости кнопками FN+
+Ниже детали найтроки для MSI
+??? хз нужно ли для lenovo
 
-Управление клавишами FN+ на msi
-В sxhkd
-яркость 
+Открыть sxhkdrc
+```
+vim ~/.config/sxhkd/sxhkdrc
+```
+Раскомментировать/Вписать
 ```
 XF86MonBrightnessUp
     brightnessctl s 5+
@@ -213,7 +184,13 @@ XF86MonBrightnessDown
     brightnessctl s 5-
 ```
 
-Громкость (с pipewire)
+### Изменения громкости кнопками FN+
+Для pipewire.
+Открыть sxhkdrc
+```
+vim ~/.config/sxhkd/sxhkdrc
+```
+Раскомментировать/Вписать
 ```
 XF86AudioRaiseVolume
     wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
@@ -225,21 +202,100 @@ XF86AudioMute
     wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 ```
 
-ZSH
-тут все по гайду 
+## Установка остальных пакетов
 ```
-apt install zsh
-```
-не забыть сменить bash и перелогиниться
-```
-chsh -s /usr/bin/zsh
+sudo apt install lightdm pipewire wireplumber pavucontrol bluez blueman libspa-0.2-bluetooth zip unzip thunar dunst flameshot lm-sensors brightnessctl lxappearance transmission vlc htop gimp peek libreoffice xss-lock i3lock 
 ```
 
-Oh My Zsh
-(скопируй из гайда с хабра)
+## Настройка lightdm
+### Отключение ненужной сесии
+Проверить что после установки создался файл отвечающий за запуск bspwm: 
+```
+/usr/share/xsessions/bspwm.desktop
+```
+Если создался еще `/usr/share/xsessions/lightdm.desktop` - добавь в него параметр ниже, чтобы эта сессия не предлагалась и был только bspwm
+```
+Hidden=true
+```
 
-Раскладка EN+RU
+### Выбор юзера из списка
+Чтобы не вводить каждый раз логин вручную, а выбирать из списка.
+Открой конфиг:
+```
+sudo vim /etc/lightdm/lightdm.conf
+```
+Паскоментируй
+```
+[Seat:*]
+greeter-hide-users=false
+```
+
+### Установка темы
+Узнать greeter
+```
+dpkg -l | grep lightdm
+```
+Скорее всего будет lightdm-gtk-greeter.  
+Открыть файл
+```
+sudo vim /etc/lightdm/lightdm-gtk-greeter.conf
+```
+Раскоментировать и вписать тему (смотри какая тема стоит в системе, Adwaita-dark приезжает вероятно с thunar)
+```
+[greeter]
+theme-name=Adwaita-dark
+```
+
+## Драйверы для видеокарты
+### MSI
+Для msi нужно заменить дефолтный `i915` на `mesa`
+```
+sudo apt install mesa-utils mesa-vulkan-drivers
+```
+`mesa-vulkan-drivers` должен приехать вместе с `xorg` (как и основной пакет mesa)
+#### Проверка драйвера видео
+```
+glxinfo | grep "OpenGL renderer"
+```
+Должно быть "Mesa Intel..."
+```
+lsmod | grep i915
+```
+Тут останется i915, это ок
+
+
+### LENOVO
+??? ДРОВА NVIDIA 
+
+Также не забудь поставить
+```
+sudo apt install nvtop
+```
+#### Проверка драйвера видео
+??? 
+
+## Звук
+`pipewire` и `wireplumber` запустятся после перезагрузки ???
+или нужно сначала активировать через ???
+Активация
+```
+systemctl --user enable --now pipewire
+systemctl --user enable --now wireplumber
+```
+## Bluetooth
+После установки `bluez` и `blueman`, проверь включен ли сервис (или перезагрузка ???)
+```
+sudo systemctl enable --now bluetooth
+```
+`bluez` вроде приезжает с Debian сразу.
+
+
+## Раскладка EN+RU
+Открыть файл
+```
 sudo vim /etc/default/keyboard
+```
+Отредактировать
 ```
 XKBMODEL="pc105"
 XKBLAYOUT="us,ru"
@@ -249,42 +305,59 @@ XKBOPTIONS="grp:alt_shift_toggle"
 BACKSPACE="guess"
 ```
 
-lightdm
-Выбор юзера, чтобы не вводить логин постоянно
-```
-sudo vim /etc/lightdm/lightdm.conf
-```
-раскоментировать
-```
-[Seat:*]
-greeter-hide-users=false
-```
-
-Тема
-Узнать greeter
-```
-dpkg -l | grep lightdm
-```
-Скорее всего будет lightdm-gtk-greeter
-В этом файле
-```
-sudo vim /etc/lightdm/lightdm-gtk-greeter.conf
-```
-Раскоментировать и вписать тему 
-```
-[greeter]
-theme-name=Adwaita-dark
-```
-
-Скринсейвер
-Проверить путь к изображению в bspwmrc
-Важно - нужно именно png
+## Screensaver
+Отвечают `xss-lock` и `i3lock`
+Проверить путь к изображению в `bspwmrc`.  
+**Важно** - нужно именно png.  
+Пример команды из `bspwmrc`
 ```
 xss-lock -- i3lock -i ~/Pictures/wallpaper.png
 ```
 
-Открывать большинство файлов в текстовом редакторе.
-Скопировать
+## OhMyZsh и Powerlevel10k
+Все по [гайду](https://habr.com/ru/articles/739376/)
+```
+apt install zsh
+```
+Не забудь сменить bash и перелогиниться
+```
+chsh -s /usr/bin/zsh
+```
+
+## Установка остальных утилит
+Остальное ставится не из репозиториев Debian
++ subime text
++ chrome
++ brave
++ v2rayN
++ telegram
++ insomnia
++ pycharm
++ charles proxy - с версией 5.xx проблемы, падает с NullPointerException, чтобы не разбираться с версиями java - ставь более старую, 4.8.x версию
++ http toolkit
++ android studio
+
+### Установка утилит в deb пакетах
+```
+sudo dpkg -i package.deb
+```
+
+### Установка утилит из архивов
+```
+tar -xzf file.tar.gz
+tar -xJf file.tar.xz
+```
+Перетащить если надо в `/opt`
+
+### Создание алиасов
+На примере telegram
+```
+sudo ln -s ~/.local/bin/telegram /usr/local/bin/telegram
+```
+
+## Настройка открытия большинства файлов в текстовом редакторе
+Пример для `Sublime Text`, но для других все аналогично.
+Скопировать дефолтный конфиг.
 ```
 cp /usr/share/applications/sublime_text.desktop ~/.local/share/applications/
 ```
@@ -319,28 +392,14 @@ text/plain=sublime_text.desktop
 text/markdown=sublime_text.desktop
 ```
 
-Првоерить или прямо через файловвый менеджер
+Проверить так или прямо через файловвый менеджер
 ```
 xdg-open dotfiles/dotfiles_2/README.md
 ```
 
-Установка утилит в deb пакетах
-```
-sudo dpkg -i package.deb
-```
+--- 
 
-Для архивов
-```
-tar -xzf file.tar.gz
-tar -xJf file.tar.xz
-```
-Перетащить если надо в /opt
 
-Создание алиаса на примере lite-xl
-```
-sudo ln -s ~/.local/bin/lite-xl /usr/local/bin/lite-xl
-```
-------------------------
 - xorg (должен включать xinit и x11-xserver-utils)
 - kitty 
 - bspwm 
@@ -381,23 +440,27 @@ sudo ln -s ~/.local/bin/lite-xl /usr/local/bin/lite-xl
 - xss-lock 
 - i3lock 
 
-Подумать (не включены в список):
-??? Diodon или все же parcellite
-gtk2-engines-murrine gtk2-engines-pixbuf - чтобы GTK2/GTK3 работали норм с lxappearance
 
 
-Осталось:
-+ zsh + 1000 что-то там
-
-+ subl или lite xl
-+ insomnia (postman)
-+ pycharm
-+ chrome
-+ brave
-+ v2rayN
-+ telegram
-+ charles proxy
-+ http toolkit
-+ android studio
-
-
+TODO
+1. + нужен ли .config/rofi/config.rasi   ??? вероятно да
+2. + нужно установить шрифты
+3. Разобраться со скриптом подключения/перекчения мониторов
+launch.sh
+monitors.sh
+Чтобы все в одном месте проверялось
+4. из bspwmrc:
+- удалить nitrogen
+- разобраться где хранить обои и поменять путь
++/- и вообще удалить лишнее из всех конфигов
++ 5. Разобраться как в lightdm по дефолту установить своего юзера
++ и что там за сессия вторая?
+6. Что за ошибки в systemctl --user status wireplumber ???
+7. Проверить автопереключние микрофон в приложениях со звонками
++ 8. поменяй раскладку и язык системы
+9. поискать темы в apt search gtk-theme
+10. Добавить в powermenu опцию для лока экрана?
+11. Разбить readme на команды в зависимости от этапа установки
+- в части установки пакетов, пока нет браузера
+12. ??? Diodon или все же parcellite
+13. gtk2-engines-murrine gtk2-engines-pixbuf - чтобы GTK2/GTK3 работали норм с lxappearance - сами приедут или как ???
