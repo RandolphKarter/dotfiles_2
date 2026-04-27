@@ -105,8 +105,12 @@ chmod +x ~/.config/polybar/launch.sh
 
 Установи шрифты для polybar
 ```
-sudo apt install fonts-font-awesome
+sudo apt install fonts-font-awesome fonts-noto-color-emoji fonts-noto fonts-noto-core fonts-noto-ui-core
 ```
+fonts-font-awesome - для для polybar
+fonts-noto-color-emoji - эмоджи в браузере и редакторах
+fonts-noto fonts-noto-core fonts-noto-ui-core - доп пакет шрифтов
+
 
 Проверь что они в системе
 ```
@@ -280,23 +284,41 @@ xss-lock -- i3lock -i ~/Pictures/wallpaper.png
 ```
 
 Открывать большинство файлов в текстовом редакторе.
-Создать/отредактировать
+Скопировать
 ```
-vim ~/.local/share/applications/lite-xl.desktop
+cp /usr/share/applications/sublime_text.desktop ~/.local/share/applications/
 ```
-Выглядеть должен так 
+Отредактировать
 ```
-[Desktop Entry]
-Name=Lite XL
-Exec=/home/fixmymind/.local/bin/lite-xl %F
-Type=Application
-MimeType=text/*;application/json;application/javascript;application/xml;application/x-yaml;application/yaml;application/x-toml;application/x-ini;application/x-shellscript;application/x-sh;application/x-bash;application/x-zsh;application/x-python;application/x-php;application/x-ruby;application/x-perl;application/x-c;application/x-c++src;application/x-java;application/x-go;application/x-rust;application/x-typescript;application/sql;application/graphql;application/x-httpd-php;application/x-nginx-conf;application/x-apache-conf;application/x-dockerfile;
-Categories=Utility;TextEditor;
+vim ~/.local/share/applications/sublime_text.desktop
 ```
+Добавив
+```
+MimeType=text/plain;text/*;application/json;application/javascript;application/xml;application/x-yaml;application/yaml;application/x-toml;application/x-ini;application/x-shellscript;application/x-sh;application/x-bash;application/x-zsh;application/x-python;application/x-php;application/x-ruby;application/x-perl;application/x-c;application/x-c++src;application/x-java;application/x-go;application/x-rust;application/x-typescript;application/sql;application/graphql;application/x-dockerfile;
+```
+
+Выполнить
+```
+xdg-mime default sublime_text.desktop text/plain
+xdg-mime default sublime_text.desktop text/markdown
+```
+
 Обновить 
 ```
 update-desktop-database ~/.local/share/applications 
 ```
+
+Проверить тут
+```
+vim ~/.config/mimeapps.list 
+```
+Что добавлены
+```
+[Default Applications]
+text/plain=sublime_text.desktop
+text/markdown=sublime_text.desktop
+```
+
 Првоерить или прямо через файловвый менеджер
 ```
 xdg-open dotfiles/dotfiles_2/README.md
