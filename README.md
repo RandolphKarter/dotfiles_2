@@ -3,7 +3,7 @@
 Можете кидаться тапками, мне пох :sunglasses:
 
 ## Подготовка и установка
-:exclamation:Не забудь сохранить все важный файлы.:exclamation:
+:exclamation:Не забудь сохранить все важные файлы.:exclamation:
 
 ### Подготовка флешки
 1. Скачать ISO образ Debian
@@ -11,7 +11,7 @@
 ```
 lsblk
 ```
-2. Записать образ на диск
+3. Записать образ на диск
 Поменять в команде 
 - `if` на путь до образа
 - `of` на название флешки
@@ -122,7 +122,8 @@ sudo vim /etc/NetworkManager/NetworkManager.conf
 ```
 И установить `true` вместо `false`
 ```
-[ifupdown] managed=true
+[ifupdown] 
+managed=true
 ```
 Перезапустить `NetworkManager` или просто ребутнуть тачку
 ```
@@ -131,7 +132,7 @@ sudo systemctl restart NetworkManager
 Теперь можно подключаться к сети через `nm-applet`
 
 ## Настройка модулей Polybar
-Все по [гайду из их вики](https://github.com/polybar/polybar/wiki)
+Все по их [вики](https://github.com/polybar/polybar/wiki)
 ### Температура
 Настрой lm-sensors (на все соглашайся)
 ```
@@ -168,14 +169,15 @@ ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", RUN+="/usr/bin/chm
 ```
 Перезагрузиться
 
-#### Изменения яркости кнопками FN+
-Ниже детали найтроки для MSI
-??? хз нужно ли для lenovo
-
+### Изменения яркости и громкости кнопками FN+
 Открыть sxhkdrc
 ```
 vim ~/.config/sxhkd/sxhkdrc
 ```
+#### Яркость
+Ниже детали найтроки для MSI
+??? хз нужно ли для lenovo
+
 Раскомментировать/Вписать
 ```
 XF86MonBrightnessUp
@@ -184,12 +186,8 @@ XF86MonBrightnessDown
     brightnessctl s 5-
 ```
 
-### Изменения громкости кнопками FN+
-Для pipewire.
-Открыть sxhkdrc
-```
-vim ~/.config/sxhkd/sxhkdrc
-```
+### Громкость
+Для pipewire.  
 Раскомментировать/Вписать
 ```
 XF86AudioRaiseVolume
@@ -344,10 +342,10 @@ sudo dpkg -i package.deb
 
 ### Установка утилит из архивов
 ```
-tar -xzf file.tar.gz
-tar -xJf file.tar.xz
+tar -xzf <FILE_NAME>.tar.gz
+tar -xJf <FILE_NAME>.tar.xz
 ```
-Перетащить если надо в `/opt`
+После распаковки лучше перетащить файлы в `/opt`
 
 ### Создание алиасов
 На примере telegram
@@ -442,25 +440,17 @@ xdg-open dotfiles/dotfiles_2/README.md
 
 
 
-TODO
-1. + нужен ли .config/rofi/config.rasi   ??? вероятно да
-2. + нужно установить шрифты
-3. Разобраться со скриптом подключения/перекчения мониторов
+## TODO
+1. Разобраться со скриптом подключения/перекчения мониторов
 launch.sh
 monitors.sh
 Чтобы все в одном месте проверялось
-4. из bspwmrc:
+2. из bspwmrc:
 - удалить nitrogen
 - разобраться где хранить обои и поменять путь
 +/- и вообще удалить лишнее из всех конфигов
-+ 5. Разобраться как в lightdm по дефолту установить своего юзера
-+ и что там за сессия вторая?
-6. Что за ошибки в systemctl --user status wireplumber ???
-7. Проверить автопереключние микрофон в приложениях со звонками
-+ 8. поменяй раскладку и язык системы
-9. поискать темы в apt search gtk-theme
-10. Добавить в powermenu опцию для лока экрана?
-11. Разбить readme на команды в зависимости от этапа установки
-- в части установки пакетов, пока нет браузера
-12. ??? Diodon или все же parcellite
-13. gtk2-engines-murrine gtk2-engines-pixbuf - чтобы GTK2/GTK3 работали норм с lxappearance - сами приедут или как ???
+3. Проверить автопереключние микрофон в приложениях со звонками
+4. поискать темы в apt search gtk-theme
+5. Добавить в powermenu опцию для лока экрана?
+6. ??? Diodon или все же parcellite
+7. gtk2-engines-murrine gtk2-engines-pixbuf - чтобы GTK2/GTK3 работали норм с lxappearance - сами приедут или как ???
