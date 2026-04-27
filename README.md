@@ -275,7 +275,7 @@ theme-name=Adwaita-dark
 Скринсейвер
 Проверить путь к изображению в bspwmrc
 Важно - нужно именно png
-````
+```
 xss-lock -- i3lock -i ~/Pictures/wallpaper.png
 ```
 
@@ -366,7 +366,6 @@ gtk2-engines-murrine gtk2-engines-pixbuf - чтобы GTK2/GTK3 работали
 
 Осталось:
 + zsh + 1000 что-то там
-
 
 + subl или lite xl
 + insomnia (postman)
