@@ -3,46 +3,39 @@
 pgrep -x sxhkd > /dev/null || sxhkd &
 
 . $HOME/.config/bspwm/monitors.sh
+# на всякий случай, если скрипт не сработает
+# bspc monitor eDP-1 -d I II III IV V VI VII VIII IX X
 
 #for pycharm and charles
-wmname LG3D
-#export _JAVA_AWT_WM_NONREPARENTING=1
+#wmname LG3D
+export _JAVA_AWT_WM_NONREPARENTING=1
 #QT_AUTO_SCREEN_SCALE_FACTOR=1
 
 
 xsetroot -cursor_name left_ptr &
 . $HOME/.config/polybar/launch.sh &
-pgrep -x xss-lock || xss-lock -- i3lock -c 000000 &
-nitrogen --restore
-
+#nitrogen --restore
+feh --bg-fill ~/iamges/chtulhu_v5.jpg
 
 bspc rule -a Gimp desktop='^5' state=tiling follow=off
-#layer=below
-#bspc rule -a Firefox-esr desktop='^2' follow=oncursor_name left_ptr &
-#bspc rule -a Gedit desktop='^3' follow=on
-#bspc rule -a Thunar desktop='^3'
-bspc rule -a jetbrains-pycharm-ce desktop='^3' follow=off
+bspc rule -a jetbrains-pycharm desktop='^3' follow=off
 bspc rule -a TelegramDesktop desktop='^4' follow=off
-#bspc rule -a kitty desktop='^1' follow=off
 bspc rule -a v2rayN desktop='^1' follow=off
 bspc rule -a Google-chrome desktop='^2' state=tiling follow=off
-#bspc rule -a mplayer2 state=floating
-#bspc rule -a Kupfer.py focus=on
-#bspc rule -a Screenkey manage=off
 bspc rule -a Peek state=floating
 
 
-#$HOME/dev/check_hdmi.sh &
 picom --config ~/.config/picom/picom.sample.conf -f &
 v2rayn &
 kitty &
 #xbindkeys &
 dunst &
 flameshot &
-parcellite &
+#parcellite &
+diodon &
 nm-applet &
-telegram-desktop &
-#google-chrome &
+telegram &
+pgrep -x xss-lock || xss-lock -- i3lock -i ~/images/chtulhu_v5.png &
 
 
 bspc config border_width         2

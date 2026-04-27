@@ -120,14 +120,29 @@ super + alt + shift + {h,j,k,l}
 super + {Left,Down,Up,Right}
 	bspc node -v {-5 0,0 5,0 -5,5 0}
 
-{XF86AudioRaiseVolume,XF86AudioLowerVolume}
-	pamixer -{i,d} 2
+#{XF86AudioRaiseVolume,XF86AudioLowerVolume}
+#	pamixer -{i,d} 2
+
+XF86AudioLowerVolume
+	wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.05-
+
+XF86AudioRaiseVolume
+	wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.05+
 
 XF86AudioMute
-	pamixer -t
+	wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 
-{XF86MonBrightnessUp,XF86MonBrightnessDown}
-	brightnessctl s {5+, 5-}
+#XF86AudioMute
+#	pamixer -t
+
+#{XF86MonBrightnessUp,XF86MonBrightnessDown}
+#	brightnessctl s {5+, 5-}
+
+XF86MonBrightnessUp
+	brightnessctl set +5%
+
+XF86MonBrightnessDown
+	brightnessctl set 5%-
 
 #m:0x0 + F1
 #	pamixer -t
