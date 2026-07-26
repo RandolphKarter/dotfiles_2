@@ -7,6 +7,12 @@
 
 ### Подготовка флешки
 1. Скачать ISO образ Debian
+**MSI**
+Достаточно netist образа.
+**LENOVO**
+Бери DVD образ, чтобы избежать танцев с бубном для wifi/lan, 
+И чтобы избежать проблем с wifi используй LAN сразу, тогда после установки будет работать инет.
+И не пропускай настройку зеркала, а то apt sources list будет пустой и придется руками заполнять.
 2. Узнать имя флешки - будет что-то типа `/dev/sda`
 ```
 lsblk
@@ -14,12 +20,12 @@ lsblk
 3. Записать образ на диск
 Поменять в команде 
 - `if` на путь до образа
-- `of` на название флешки
+- `of` на название флешки, обязательно с /dev/
 Пример:
 ```
 sudo dd if=/home/<USER>/Downloads/debian_13.iso of=/dev/sda bs=4M status=progress oflag=sync
 ``` 
-3. После записи
+4. После записи
 ```
 sync
 ```
@@ -35,6 +41,8 @@ sync
     - ФС: `ext4` (по умолчанию)
 - `/boot` - 500 MB или 1 GB
     - ФС: `ext4`
+- `/var` - 10GB
+    - ФС: `ext4`
 - `/home` - все оставшееся
     - ФС: `ext4`
 
@@ -44,16 +52,22 @@ sync
 ```
 apt install sudo
 ```
+Если был использовался образ DVD, то sudo уже есть в системе.
+
 2. Добавить юзера в sudo 
 ```
 usermod -aG sudo username
+```
+Под рутом может говориить что команды нет (не верь, она приезжает в пакете passwd, который уже стоит), поэтому стоит пробовать как ниже, и все будет ок:
+```
+/usr/bins/usermod -aG sudo username
 ```
 
 ## Установка первых пакетов
 Установить первые пакеты.  
 Все что необходимо для работы в терминале и первичной настройки окружения.
 ```
-sudo apt install xorg xinit x11-xserver-utils kitty bspwm sxhkd picom rofi polybar git curl tree nnn vim network-manager network-manager-gnome firefox-esr
+sudo apt install xorg xinit x11-xserver-utils kitty bspwm sxhkd picom rofi polybar git curl tree nnn vim network-manager network-manager-gnome firefox-esr lightdm lm-sensors brightnessctl feh
 ```
 Возможно xinit x11-xserver-utils уже установлены, в Debian 13 они идут в вместе с `xorg`
 
@@ -71,10 +85,13 @@ sudo apt install xorg xinit x11-xserver-utils kitty bspwm sxhkd picom rofi polyb
 - `.config/rofi/powermenu.sh` - кнопка poweroff/reboot в polybar
 - `.config/kitty/kitty.conf`
 - `.config/picom/picom.sample.conf`
+- `.config/tmux/tmux.conf`
+- `.config/mpd/mpd.conf`
+- `.config/ncmpcpp/config`
 
 Отдельно лежащий файл brave (скрипт для запуска brave с local proxy) перетащи сюда:
 ```
-/usr/local/bin/brave
+/.local/bin/brave
 ```
 
 Сделать исполняемыми:
@@ -129,7 +146,26 @@ managed=true
 ```
 sudo systemctl restart NetworkManager
 ```
-Теперь можно подключаться к сети через `nm-applet`
+Проверь снова доступные интерфейсы:
+```
+nmcli dev status
+```
+Проверь что отображаются wifi сети:
+```
+nmcli dev wifi list 
+```
+Подключайся так:
+```
+nmcli dev wifi connect "SSID" password "PASSWORD"
+```
+Или через через `nm-applet`
+
+Еще можно проверить что wifi интерфейс поднят командой
+```
+ip a
+```
+Должно быть UP
+
 
 ## Настройка модулей Polybar
 Все по их [вики](https://github.com/polybar/polybar/wiki)
@@ -143,8 +179,8 @@ sudo sensors-detect
 sensors
 ```
 Смотри что там по `Package id 0`
-- MSI, найди нужный сенсор ??? `Package id 0`
-- LENOVO - ???
+- MSI - найди нужный сенсор ??? `Package id 0`
+- LENOVO - надо поменять hwmon-path
 
 ### Батарея
 Просто заменить пару значений в соответствии с гайдом
@@ -175,8 +211,8 @@ ACTION=="add", SUBSYSTEM=="backlight", KERNEL=="acpi_video0", RUN+="/usr/bin/chm
 vim ~/.config/sxhkd/sxhkdrc
 ```
 #### Яркость
-Ниже детали найтроки для MSI
-??? хз нужно ли для lenovo
+Ниже детали настройки для MSI.
+Для lenovo нужно сперва поставить дрова nvidia.
 
 Раскомментировать/Вписать
 ```
@@ -202,7 +238,7 @@ XF86AudioMute
 
 ## Установка остальных пакетов
 ```
-sudo apt install lightdm pipewire wireplumber pavucontrol bluez blueman libspa-0.2-bluetooth zip unzip thunar dunst flameshot lm-sensors brightnessctl lxappearance transmission vlc htop gimp peek libreoffice xss-lock i3lock 
+sudo apt install pipewire wireplumber pavucontrol bluez blueman libspa-0.2-bluetooth zip unzip thunar dunst flameshot lxappearance transmission vlc htop gimp peek libreoffice xss-lock i3lock jq viewnior btop blueman-applet adb keepassxc tmux mpd ncmpcpp
 ```
 
 ## Настройка lightdm
@@ -244,6 +280,21 @@ sudo vim /etc/lightdm/lightdm-gtk-greeter.conf
 theme-name=Adwaita-dark
 ```
 
+### Установка фона
+Сделать копию картинки фона в `/usr/share/`
+```
+sudo cp /path/to/image.jpg /usr/share/pixmaps/bg.jpg
+```
+Прописать путь к картинке 
+```
+sudo vim /etc/lightdm/lightdm-gtk-greeter.conf
+```
+Параметр `background=/путь/к/картинке`
+После рестарта все должно быть ок.
+
+Альтернативный вариант - настроить права для картинок/папки в которой они лежат.
+
+
 ## Драйверы для видеокарты
 ### MSI
 Для msi нужно заменить дефолтный `i915` на `mesa`
@@ -273,13 +324,13 @@ sudo apt install nvtop
 ??? 
 
 ## Звук
-`pipewire` и `wireplumber` запустятся после перезагрузки ???
-или нужно сначала активировать через ???
 Активация
 ```
 systemctl --user enable --now pipewire
 systemctl --user enable --now wireplumber
 ```
+Если что попробуй перезагрузиться.
+
 ## Bluetooth
 После установки `bluez` и `blueman`, проверь включен ли сервис (или перезагрузка ???)
 ```
@@ -320,6 +371,13 @@ apt install zsh
 Не забудь сменить bash и перелогиниться
 ```
 chsh -s /usr/bin/zsh
+```
+
+## Настройка viewnior (просмотрщик изображений)
+После установки, чтобы формат открывались в нем по дефолту выполнить:
+```
+xdg-mime default viewnior.desktop image/png
+xdg-mime default viewnior.desktop image/jpeg
 ```
 
 ## Установка остальных утилит
@@ -390,10 +448,27 @@ text/plain=sublime_text.desktop
 text/markdown=sublime_text.desktop
 ```
 
-Проверить так или прямо через файловвый менеджер
+Проверить так или прямо через файловый менеджер
 ```
 xdg-open dotfiles/dotfiles_2/README.md
 ```
+
+## mpd + ncmpcpp
+Запуск
+```
+systemctl --user enable mpd
+systemctl --user start mpd
+```
+
+
+## Forti
+Чтобы заработал forti - проверь запускается ли его трей, если нет, скроее всего нет libgtk2.0-0
+Попробуй сперва его запустить /opt/forticlient/fortitraylauncher
+Если там ошибка ставь 
+```
+sudo apt install libgtk2.0-0
+```
+Еще forti хочет чтобы в системе был iptables, придется ставить и его
 
 --- 
 
@@ -436,8 +511,17 @@ xdg-open dotfiles/dotfiles_2/README.md
 - peek
 - libreoffice
 - xss-lock 
-- i3lock 
-
+- i3lock
+- jq
+- feh
+- viewnior
+- btop
+- blueman-applet
+- adb
+- keepassxc
+- tmux
+- mpd
+- ncmpcpp
 
 
 ## TODO
@@ -445,12 +529,12 @@ xdg-open dotfiles/dotfiles_2/README.md
 launch.sh
 monitors.sh
 Чтобы все в одном месте проверялось
-2. из bspwmrc:
-- удалить nitrogen
-- разобраться где хранить обои и поменять путь
-+/- и вообще удалить лишнее из всех конфигов
-3. Проверить автопереключние микрофон в приложениях со звонками
-4. поискать темы в apt search gtk-theme
-5. Добавить в powermenu опцию для лока экрана?
-6. ??? Diodon или все же parcellite
-7. gtk2-engines-murrine gtk2-engines-pixbuf - чтобы GTK2/GTK3 работали норм с lxappearance - сами приедут или как ???
+2. Опиши инструкцию по установке дров NVIDIA
+дрова nvidia по инструкции, но лучше выписать команды
+там заголовки ядра надо обновлять еще и правильно включать репозитории в sources.list, чтобы не было повторов (надо с этим разобраться)
+3. С яркостью для nvidia нужно также выдавать права + не забыть в них поменять значение в KERNEL и PATH (для lenovo там будет nvidia_0 ???)
+4. в конфиге polybar сделать второй блок с lenovo для батарейки, чтобы переключать раскоментированием
+5. блок по настройке tmux
+6. В mpd нужно ли создавать папку для плейлистов?
+7. Описать что надо запускать в tmux для установки плагинов
+8. gtk2-engines-murrine gtk2-engines-pixbuf - чтобы GTK2/GTK3 работали норм с lxappearance - сами приедут или как ???
